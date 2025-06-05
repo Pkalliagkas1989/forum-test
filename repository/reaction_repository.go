@@ -2,6 +2,8 @@ package repository
 
 import (
 	"database/sql"
+	"time"
+
 	"forum/models"
 )
 
@@ -33,4 +35,10 @@ func (r *ReactionRepository) GetAllReactions() ([]models.Reaction, error) {
 	}
 
 	return reactions, nil
+}
+
+func (r *ReactionRepository) AddReaction(userID string, reactionType int, postID, commentID *string) error {
+	_, err := r.db.Exec(`INSERT OR REPLACE INTO reactions (user_id, reaction_type, comment_id, post_id, created_at) VALUES (?, ?, ?, ?, ?)`,
+		userID, reactionType, commentID, postID, time.Now())
+	return err
 }

@@ -11,7 +11,6 @@ type Comment struct {
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
-
 // CommentWithUser is a comment along with the username of its author
 type CommentWithUser struct {
 	ID        string    `json:"id"`
@@ -20,4 +19,11 @@ type CommentWithUser struct {
 	Username  string    `json:"username"`
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+// CommentCreateRequest represents a request to add a comment
+// used by API handlers when authenticated users create comments.
+type CommentCreateRequest struct {
+	PostID  string `json:"post_id"`
+	Content string `json:"content"`
 }

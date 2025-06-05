@@ -22,6 +22,9 @@ func SetupRoutes(db *sql.DB) http.Handler {
 
 	// Create handlers
 	authHandler := handlers.NewAuthHandler(userRepo, sessionRepo)
+	actionHandler := handlers.NewActionHandler(commentRepo, reactionRepo)
+	userHandler := handlers.NewUserHandler(categoryRepo, postRepo, commentRepo, reactionRepo)
+	categoryHandler := handlers.NewCategoryHandler(categoryRepo)
 
 	// Create middleware
 	registerLimiter := middleware.NewRateLimiter()
@@ -34,10 +37,14 @@ func SetupRoutes(db *sql.DB) http.Handler {
 
 	// Define auth routes
 	mux.Handle("/forum/api/guest", corsMiddleware.Handler(http.HandlerFunc(guestHandler.GetGuestData)))
+	mux.Handle("/forum/api/categories", corsMiddleware.Handler(http.HandlerFunc(categoryHandler.GetCategories)))
 	mux.Handle("/forum/api/register", corsMiddleware.Handler(http.HandlerFunc(registerLimiter.Limit(authHandler.Register))))
 	mux.Handle("/forum/api/session/login", corsMiddleware.Handler(http.HandlerFunc(authHandler.Login)))
 	mux.HandleFunc("/forum/api/session/logout", authHandler.Logout)
 	mux.Handle("/forum/api/session/verify", corsMiddleware.Handler(http.HandlerFunc(authHandler.VerifySession)))
+	mux.Handle("/forum/api/user", corsMiddleware.Handler(authMiddleware.RequireAuth(http.HandlerFunc(userHandler.GetUserData))))
+	mux.Handle("/forum/api/comment", corsMiddleware.Handler(authMiddleware.RequireAuth(http.HandlerFunc(actionHandler.AddComment))))
+	mux.Handle("/forum/api/react", corsMiddleware.Handler(authMiddleware.RequireAuth(http.HandlerFunc(actionHandler.React))))
 
 	// Apply middleware to all routes
 	return authMiddleware.Authenticate(mux)

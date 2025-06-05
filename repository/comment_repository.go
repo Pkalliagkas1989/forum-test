@@ -2,7 +2,10 @@ package repository
 
 import (
 	"database/sql"
+	"time"
+
 	"forum/models"
+	"forum/utils"
 )
 
 type CommentRepository struct {
@@ -33,4 +36,15 @@ func (r *CommentRepository) GetAllComments() ([]models.Comment, error) {
 	}
 
 	return comments, nil
+}
+
+func (r *CommentRepository) AddComment(postID, userID, content string) (*models.Comment, error) {
+	id := utils.GenerateUUID()
+	created := time.Now()
+	_, err := r.db.Exec(`INSERT INTO comments (comment_id, post_id, user_id, content, created_at) VALUES (?, ?, ?, ?, ?)`,
+		id, postID, userID, content, created)
+	if err != nil {
+		return nil, err
+	}
+	return &models.Comment{ID: id, PostID: postID, UserID: userID, Content: content, CreatedAt: created}, nil
 }
