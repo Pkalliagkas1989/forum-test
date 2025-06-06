@@ -24,6 +24,13 @@ curl -X POST http://localhost:8080/forum/api/session/login \
 curl -X POST http://localhost:8080/forum/api/session/logout \
   -b cookies.txt
 
+## Create a comment
+
+curl -X POST http://localhost:8080/forum/api/comments \
+  -H "Content-Type: application/json" \
+  -d '{"post_id":"<POST_ID>","content":"Nice post!"}' \
+  -b cookies.txt
+
 
 ## Front
 
